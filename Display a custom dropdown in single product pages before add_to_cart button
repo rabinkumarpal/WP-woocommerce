@@ -1,0 +1,80 @@
+// Display a custom dropdown in single product pages before add_to_cart button
+
+function display_dropdown_in_ends_qortechno() {
+ if (!(is_product_category() || is_shop()) ) {
+	
+	 
+	echo '<div class="quantity">
+	<label class="unit_label" for="id_dropdown_one_end">Unit</label>
+        <select id ="id_dropdown_one_end" name="dropdown_one_end">
+			<option disabled selected value> - Select a Unit - </option>
+            <option value="gal">gal</option>
+            <option value="gr">gr</option>
+            <option value="Ib">Ib</option>
+			<option value="kg">kg</option>
+			<option value="mg">mg</option>
+			<option value="li">li</option>
+			<option value="ml">ml</option>
+            <option value="oz">oz</option>
+			<option value="sample/MOQ">sample/MOQ</option>
+            <option value="ton">ton</option>
+			<option value="other">other</option>
+	
+        </select>
+    </div>';
+ 
+}
+}
+add_action( 'woocommerce_after_add_to_cart_quantity', 'display_dropdown_in_ends_qortechno');
+
+function iconic_add_engraving_text_to_cart_item( $cart_item_data, $product_id, $variation_id ) {
+	$cart_item_data['product_unit'] = 'gal';
+	return $cart_item_data;
+}
+add_filter( 'woocommerce_add_cart_item_data', 'iconic_add_engraving_text_to_cart_item', 10, 3 );
+
+add_filter('woocommerce_stock_amount_cart_item', 'custom_woocommerce_update_cart_validation', 10, 2);
+function custom_woocommerce_update_cart_validation( $stock, $cart_item_key ){
+	$items = WC()->cart->get_cart();
+	$cart = $_POST['cart'];
+	if( isset( $cart[$cart_item_key] ) && isset( $cart[$cart_item_key]['unit'] ) ){
+		global $woocommerce;
+		$woocommerce->cart->cart_contents[$cart_item_key]['product_unit'] = $cart[$cart_item_key]['unit'];		
+	}
+	return $stock;
+}
+
+function custom_woocommerce_cart_item_name( $product_name, $cart_item, $cart_item_key ){
+	$product_selecton = isset( $cart_item['product_unit'] ) ? $cart_item['product_unit'] : '';
+	if( $product_selecton ){
+		$product_name .= '<span style="display: block;" class="product-unit">Unit: '. $product_selecton .'</span>';
+	}	
+	return $product_name;
+}
+// add_filter('woocommerce_checkout_cart_item_quantity', 'custom_woocommerce_cart_item_name', 10, 3);
+
+add_action('woocommerce_add_order_item_meta','add_product_unit_to_order_item_meta', 9, 3 );
+function add_product_unit_to_order_item_meta( $item_id, $item_values, $item_key ) {
+    if( ! empty( $item_values['product_unit'] ) )
+        wc_add_order_item_meta( $item_id, 'Unit', sanitize_text_field( $item_values['product_unit'] ) );
+}
+
+/**
+* Remove the Unit from display meta in thank you and email.
+*/
+function custom_display_item_meta( $html, $item, $args ){
+	$strings = array();
+	$html    = '';
+	foreach ( $item->get_formatted_meta_data() as $meta_id => $meta ) {
+		if( trim( $meta->display_key ) !== 'Unit' ){
+				$value     = $args['autop'] ? wp_kses_post( $meta->display_value ) : wp_kses_post( make_clickable( trim( $meta->display_value ) ) );
+			$strings[] = $args['label_before'] . wp_kses_post( $meta->display_key ) . $args['label_after'] . $value;
+		}		
+	}
+
+	if ( $strings ) {
+		$html = $args['before'] . implode( $args['separator'], $strings ) . $args['after'];
+	}
+	return $html;
+}
+add_filter('woocommerce_display_item_meta', 'custom_display_item_meta', 10, 3);
