@@ -1,0 +1,8 @@
+add_filter( 'wc_add_to_cart_message_html', '__return_null' );
+/*
+add_filter( 'wc_add_to_cart_message_html', 'rabin_custom_add_to_cart_message' );
+ 
+function rabin_custom_add_to_cart_message() {
+   $message = 'Nicely done!' ;
+   return $message;
+}*/
