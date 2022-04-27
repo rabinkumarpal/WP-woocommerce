@@ -1,0 +1,44 @@
+// Part 1
+// Single Product Page Add to Cart
+ 
+add_filter( 'woocommerce_product_single_add_to_cart_text', 'bbloomer_custom_add_cart_button_single_product', 9999 );
+ 
+function bbloomer_custom_add_cart_button_single_product( $label ) {
+   if ( WC()->cart && ! WC()->cart->is_empty() ) {
+      foreach( WC()->cart->get_cart() as $cart_item_key => $values ) {
+         $product = $values['data'];
+         if ( get_the_ID() == $product->get_id() ) {
+            $label = 'Already in list.?';
+            break;
+         }
+      }
+   }
+   return $label;
+}
+ 
+// Part 2
+// Loop Pages Add to Cart
+ add_filter( 'woocommerce_product_add_to_cart_text', 'bbloomer_custom_add_cart_button_loop', 9999, 2 );
+ 
+function bbloomer_custom_add_cart_button_loop( $label, $product ) {
+   if ( $product->get_type() == 'simple' && $product->is_purchasable() && $product->is_in_stock() ) {
+      if ( WC()->cart && ! WC()->cart->is_empty() ) {
+		   if ( is_shop() ) {
+			  // WC()->cart->get_cart()
+			 foreach( WC()->cart->get_cart() as $cart_item_key => $values ) {
+				$_product = $values['data'];
+				if ( get_the_ID() == $_product->get_id() ) {
+					$ids=$_product->get_id();
+				   $label = 'Already in list.?' + $ids;
+
+								//  add_filter( 'woocommerce_is_purchasable', '__return_false' );
+								//remove_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart'($ids));
+
+				   break;
+				}
+			 }
+		 } 
+      }
+   }
+   return $label;
+}
