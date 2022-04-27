@@ -1,0 +1,4 @@
+add_filter( 'woocommerce_get_price_html', 'qortechno_remove_price');
+function qortechno_remove_price($price){     
+     return ;
+}
