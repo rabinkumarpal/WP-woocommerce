@@ -1,4 +1,5 @@
 // Display a custom dropdown in single product pages before add_to_cart button
+// modify woo-cart file in wordpress for display custom dropdown
 
 function display_dropdown_in_ends_qortechno() {
  if (!(is_product_category() || is_shop()) ) {
