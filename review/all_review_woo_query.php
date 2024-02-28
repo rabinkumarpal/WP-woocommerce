@@ -1,4 +1,5 @@
 <?php
+<!-- Author: rabin Pal   -->
 $args = array(
     'post_type'   => 'product',
     'post_status' => 'publish',
